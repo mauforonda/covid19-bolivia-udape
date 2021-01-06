@@ -1,0 +1,38 @@
+name: Update
+on:
+  schedule:
+    - cron: '0 12-23/2 * * *'
+jobs:
+  update:
+    name: check, update and commit
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@master
+      - name: setup python
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.6'
+      - name: setup python
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r update/requirements.txt
+      - name: run update script
+        id: update-script
+        run: |
+          echo ::set-output name=result::$(python update/update.py)
+      - name: git status
+        id: git-status
+        run: |
+          git config --global user.email "covid19-bot@example.com"
+          git config --global user.name "covid19-bot"
+          echo ::set-output name=result::$(git status | tr -d "\n" | grep -c "nothing to commit")
+      - name: commit
+        if: steps.git-status.outputs.result == 0
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          DATE: ${{ steps.update-script.outputs.result }}
+        run: |
+          git add -A
+          git commit -m "[ci] $DATE"
+          git push -q "https://$GH_TOKEN@github.com/mauforonda/covid19-bolivia-udape.git" master
