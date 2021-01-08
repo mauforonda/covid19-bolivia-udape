@@ -88,7 +88,7 @@ def make_dataframe(data, filename):
     df = pd.concat([empty, df], axis=0)
     df = df[~df.index.duplicated(keep='last')].fillna(0)
     df[columns] = df[columns].astype(int)
-    df[df.index <= report_day].to_csv(filename+'.csv')
+    df[df.index <= report_day].sort_index().to_csv(filename+'.csv')
 
 
 # Nuevo reporte?
