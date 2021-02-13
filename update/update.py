@@ -8,6 +8,7 @@ import pdfplumber
 from io import BytesIO
 import unicodedata
 import re
+import os
 
 def get_reportfn():
     url = 'https://www.udape.gob.bo/index.php?option=com_content&view=article&id=220:reporte-covid-19&catid=41'
@@ -95,6 +96,9 @@ def make_dataframe(data, filename):
     df = df.replace(to_replace='\.', value='', regex=True)
     df.Fecha = df.Fecha.apply(lambda _: format_date(_))
     df.set_index('Fecha', inplace=True)
+    if '{}.csv'.format(filename) in os.listdir('update/patches/'):
+        df = pd.concat([df, pd.read_csv('update/patches/{}.csv'.format(filename), parse_dates=[0], index_col=0)], axis=0)
+        df = df[~df.index.duplicated(keep='last')].fillna(0)
     df = pd.concat([empty, df], axis=0)
     df = df[~df.index.duplicated(keep='last')].fillna(0)
     df[columns] = df[columns].astype(int)
