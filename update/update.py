@@ -38,36 +38,45 @@ def get_data_diarios(page):
     table = pd.DataFrame(page.extract_tables()[0]).T.drop(columns=[1])
     table.columns = table.iloc[0].apply(lambda _ : _.replace('(*)','').strip()).tolist()
     table = table[1:]
+    confirmados_diarios_page, decesos_diarios_page, recuperados_diarios_page = [], [], []
     for i, row in table.iterrows():
         if row['Departamento'] != None:
             fecha = row['Departamento']
             ii = 0
-            confirmados_diarios.append([fecha] + row[columns].tolist())
+            confirmados_diarios_page.append([fecha] + row[columns].tolist())
         else:
             if ii == 0:
-                decesos_diarios.append([fecha] + row[columns].tolist())
+                decesos_diarios_page.append([fecha] + row[columns].tolist())
                 ii += 1
             else:
-                recuperados_diarios.append([fecha] + row[columns].tolist())
+                recuperados_diarios_page.append([fecha] + row[columns].tolist())
+    confirmados_diarios.extend(confirmados_diarios_page[::-1])
+    decesos_diarios.extend(decesos_diarios_page[::-1])
+    recuperados_diarios.extend(recuperados_diarios_page[::-1])
 
 def get_data_acumulados(page):
     table = pd.DataFrame(page.extract_tables()[0]).T.drop(columns=[1])
     table.columns = table.iloc[0].apply(lambda _ : _.replace('(*)','').strip()).tolist()
     table = table[1:]
+    confirmados_acumulados_page, activos_acumulados_page, decesos_acumulados_page, recuperados_acumulados_page = [], [], [], []
     for i, row in table.iterrows():
         if row['Departamento'] != None:
             fecha = row['Departamento']
             ii = 0
-            confirmados_acumulados.append([fecha] + row[columns].tolist())
+            confirmados_acumulados_page.append([fecha] + row[columns].tolist())
         else:
             if ii == 0:
-                activos_acumulados.append([fecha] + row[columns].tolist())
+                activos_acumulados_page.append([fecha] + row[columns].tolist())
                 ii += 1
             elif ii == 1:
-                decesos_acumulados.append([fecha] + row[columns].tolist())
+                decesos_acumulados_page.append([fecha] + row[columns].tolist())
                 ii += 1
             else:
-                recuperados_acumulados.append([fecha] + row[columns].tolist())
+                recuperados_acumulados_page.append([fecha] + row[columns].tolist())
+    confirmados_acumulados.extend(confirmados_acumulados_page[::-1])
+    activos_acumulados.extend(activos_acumulados_page[::-1])
+    decesos_acumulados.extend(decesos_acumulados_page[::-1])
+    recuperados_acumulados.extend(recuperados_acumulados_page[::-1])
                 
 def format_date(text):
     global whatyear
@@ -79,6 +88,7 @@ def format_date(text):
 
 def make_dataframe(data, filename):
     global whatyear
+    data = data[::-1]
     whatyear = 2020
     df = pd.DataFrame(data, columns=['Fecha'] + columns)
     df = df.replace(to_replace='', value=0)
@@ -103,7 +113,13 @@ if last < reportfn2date(reportfn):
     whatyear = 2020
 
     # Cargo el reporte
-    pdf = pdfplumber.open(BytesIO(requests.get(report_url).content))
+    req = requests.get(report_url)
+    if req.status_code != 200:
+        raise SystemError("El enlace es incorrecto")
+    try:
+        pdf = pdfplumber.open(BytesIO(req.content))
+    except Exception:
+        raise SystemError("Error al cargar el pdf")
 
     # Donde acopio datos
     confirmados_diarios, decesos_diarios, recuperados_diarios = [],[],[]
