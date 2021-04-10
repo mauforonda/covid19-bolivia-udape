@@ -17,7 +17,9 @@ def get_reportfn():
     return fn
 
 def reportfn2date(fn):
-    return dt.datetime.strptime(fn.split('COVID-2019_')[1], '%d_%m_%Y.pdf').date()
+    match = re.findall('([0-9]*_[0-9]*_[0-9]*21)', reportfn)[0]
+    dateformat = '%d_%m_%Y' if len(match.split('_')[-1]) == 4 else '%d_%m_%y'
+    return dt.datetime.strptime(match, dateformat).date()
 
 def get_last(fn):
     return pd.read_csv(fn, parse_dates=[0], index_col=0).index[-1].date()
