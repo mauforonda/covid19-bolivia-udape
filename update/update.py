@@ -82,20 +82,14 @@ def format_date(text):
 
 def make_dataframe(data, filename):
     global whatyear
-    whatyear = 2020
+    whatyear = 2021
     df = pd.DataFrame(data, columns=['Fecha'] + columns)
     df = df.replace(to_replace='', value=0)
     df = df.replace(to_replace='\.', value='', regex=True)
     df.Fecha = df.Fecha.apply(lambda _: format_date(_))
-    df.set_index('Fecha', inplace=True)
-    if '{}.csv'.format(filename) in os.listdir('update/patches/'):
-        df = pd.concat([df, pd.read_csv('update/patches/{}.csv'.format(filename), parse_dates=[0], index_col=0)], axis=0)
-        df = df[~df.index.duplicated(keep='last')].fillna(0)
-    df = pd.concat([empty, df], axis=0)
-    df = df[~df.index.duplicated(keep='last')].fillna(0)
     df[columns] = df[columns].astype(int)
-    df[df.index <= report_day].sort_index().to_csv(filename+'.csv')
-
+    df = pd.concat([pd.read_csv(filename+'.csv', parse_dates=[0]).rename(columns={'Unnamed: 0': 'Fecha'}), df]).drop_duplicates(subset=['Fecha'], keep='last').set_index('Fecha')
+    df[df.index <= report_day].sort_index().to_csv(filename+'.csv', index_label='')
 
 # Nuevo reporte?
 reportfn = get_reportfn()
