@@ -13,7 +13,7 @@ import os
 def get_reportfn():
     url = 'https://www.udape.gob.bo/index.php?option=com_content&view=article&id=220:reporte-covid-19&catid=41'
     html = BeautifulSoup(requests.get(url).text, 'html.parser')
-    fn = html.select('#table1 li a')[0]['href'].split('/')[-1]
+    fn = html.select('#table1 li a')[-1]['href'].split('/')[-1]
     return fn
 
 def reportfn2date(fn):
