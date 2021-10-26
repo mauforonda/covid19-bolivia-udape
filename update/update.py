@@ -39,7 +39,7 @@ def month_matcher(text):
 
 def get_data_diarios(page):
     table = pd.DataFrame(page.extract_tables()[0]).T.drop(columns=[1])
-    table.columns = table.iloc[0].apply(lambda _ : _.replace('(*)','').strip()).tolist()
+    table.columns = table.iloc[0].apply(lambda _ : _.replace('\n', '').replace('(*)','').strip()).tolist()
     table = table[1:]
     for i, row in table.iterrows():
         if row['Departamento'] != None:
