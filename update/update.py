@@ -17,7 +17,7 @@ def get_reportfn():
     return fn
 
 def reportfn2date(fn):
-    match = re.findall('([0-9]*_[0-9]*_[0-9]*21)', reportfn)[0]
+    match = re.findall('([0-9]*_[0-9]*_[0-9]*2[1-3]{1})', reportfn)[0]
     dateformat = '%d_%m_%Y' if len(match.split('_')[-1]) == 4 else '%d_%m_%y'
     return dt.datetime.strptime(match, dateformat).date()
 
