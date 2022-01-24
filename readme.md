@@ -1,5 +1,11 @@
 > Datos de casos de covid-19 por departamento en Bolivia, publicados por UDAPE y transcritos diariamente
 
+**Nota del 24 de Enero de 2022**
+
+**LOS DATOS SERÁN ACTUALIZADOS EN ESTA NUEVA DIRECCIÓN: [sociedatos/covid19-bo-casos_por_departamento](https://github.com/sociedatos/covid19-bo-casos_por_departamento)**
+
+---
+
 **Fuente**: Reportes diarios de la situación del covid-19 en Bolivia publicados por UDAPE ([enlace](https://www.udape.gob.bo/index.php?option=com_wrapper&view=wrapper&Itemid=104))
 
 En este repositorio encuentras:
